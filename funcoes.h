@@ -1,3 +1,6 @@
+#ifndef _FUNCOES_H
+#define _FUNCOES_H
+
 #define PI 3.14159265358979323846
 #define E_NUM 2.7182818284590452354
 
@@ -20,3 +23,4 @@ my_float my_pow(my_float x, int n) {
     }
     return resultado;
 }
+#endif

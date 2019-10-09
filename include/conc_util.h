@@ -1,5 +1,5 @@
-#ifndef CONC_UTIL
-#define CONC_UTIL
+#ifndef _CONC_UTIL_H
+#define _CONC_UTIL_H
 
 #include <pthread.h>
 #include <stdio.h>
