@@ -3,6 +3,10 @@
 
 #include "include/conc_util.h"
 
+/*
+Implementação de uma fila, usada para o cálculo concorrente da integral. 
+*/
+
 #define TAM_INICIAL 8
 
 typedef int tipo_fila;
@@ -15,7 +19,7 @@ typedef struct {
     int n_elementos;
 } Fila;
 
-static void init_fila(Fila *fila) {
+static void fila_init(Fila *fila) {
     fila->vec = (tipo_fila*)Malloc(sizeof(tipo_fila) * TAM_INICIAL);
     fila->tamanho = TAM_INICIAL;
     fila->n_elementos = 0;
@@ -23,11 +27,11 @@ static void init_fila(Fila *fila) {
     fila->fim = 0;
 }
 
-static void delete_fila(Fila *fila) {
+static void fila_delete(Fila *fila) {
     free(fila->vec);
 }
 
-static void overflow_fila(Fila *fila) {
+static void fila_overflow(Fila *fila) {
     int novo_tamanho = 2 * fila->tamanho;
     tipo_fila* novo_vec = (tipo_fila*)Malloc(sizeof(tipo_fila) * novo_tamanho);
     
@@ -44,7 +48,7 @@ static void overflow_fila(Fila *fila) {
     fila->vec = novo_vec;
 }
 
-static void insere_fila(Fila *fila, tipo_fila elemento) {
+static void fila_insere(Fila *fila, tipo_fila elemento) {
     if( fila->n_elementos == fila->tamanho) {
         overflow_fila(fila);
     }
@@ -54,7 +58,7 @@ static void insere_fila(Fila *fila, tipo_fila elemento) {
     fila->n_elementos++;
 }
 
-static tipo_fila remove_fila(Fila *fila) {
+static tipo_fila fila_remove(Fila *fila) {
     if(fila->n_elementos == 0) {
         printf("fila.h :: Tentando retirar elemento de fila vazia\n");
         return fila->vec[0];
@@ -66,7 +70,7 @@ static tipo_fila remove_fila(Fila *fila) {
     return elemento_retirado;
 }
 
-static void print_fila(Fila fila) {
+static void fila_print(Fila fila) {
     int iter = fila.inicio;
     for( int i = 0; i < fila.n_elementos; i++ ) {
         printf("%d ", fila.vec[iter]);

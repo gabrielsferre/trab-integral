@@ -1,14 +1,15 @@
-ARQUIVO_TESTE_FUNC = testes_funcoes.c
-ARQUIVO_TESTE_FILA = testes_fila.c
+INTEGRAL_SEQ = integral_sequencial.c
+TESTE_SEQ = testes_integral_sequencial.c
+TESTE_FILA = testes_fila.c
 
-testes_funcoes.out: $(ARQUIVO_TESTE_FUNC)
-	gcc -Wall $(ARQUIVO_TESTE_FUNC) -o testes_funcoes.out
+testes_integral_sequencial.out: $(INTEGRAL_SEQ) $(TESTE_SEQ)
+	gcc -Wall $(INTEGRAL_SEQ) $(TESTE_SEQ) -o testes_integral_sequencial.out -lm -lpthread
 
-testes_fila.out: $(ARQUIVO_TESTE_FILA)
-	gcc -Wall $(ARQUIVO_TESTE_FILA) -o testes_fila.out -lpthread
+testes_fila.out: $(TESTE_FILA)
+	gcc -Wall $(TESTE_FILA) -o testes_fila.out -lpthread
 
-testa-funcoes: testes_funcoes.out
-	./testes_funcoes.out
+testa-integral-sequencial: testes_integral_sequencial.out
+	./testes_integral_sequencial.out
 
 testa-fila: testes_fila.out
 	./testes_fila.out
