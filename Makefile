@@ -1,11 +1,12 @@
 INTEGRAL_SEQ = integral_sequencial.c
 TESTE_SEQ = testes_integral_sequencial.c
+FILA = include/fila.h
 TESTE_FILA = testes_fila.c
 
 testes_integral_sequencial.out: $(INTEGRAL_SEQ) $(TESTE_SEQ)
 	gcc -Wall $(INTEGRAL_SEQ) $(TESTE_SEQ) -o testes_integral_sequencial.out -lm -lpthread
 
-testes_fila.out: $(TESTE_FILA)
+testes_fila.out: $(FILA) $(TESTE_FILA)
 	gcc -Wall $(TESTE_FILA) -o testes_fila.out -lpthread
 
 testa-integral-sequencial: testes_integral_sequencial.out

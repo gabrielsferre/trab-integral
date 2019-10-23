@@ -1,5 +1,6 @@
 #include "include/integral_sequencial.h"
 #include <stdio.h>
+
 static my_float my_abs(my_float n) {
     return n < 0 ? -n : n;
 }

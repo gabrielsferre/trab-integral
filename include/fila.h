@@ -1,15 +1,16 @@
 #ifndef _FILA_H
 #define _FILA_H 
 
-#include "include/conc_util.h"
+#include "conc_util.h"
 
 /*
-Implementação de uma fila, usada para o cálculo concorrente da integral. 
+Implementação de uma fila, usada para o cálculo concorrente da integral.
 */
 
 #define TAM_INICIAL 8
 
-typedef int tipo_fila;
+// O tipo "tipo_fila" deve ser definido pelo arquivo que estiver incluindo fila.h,
+// antes de incluir fila.h 
 
 typedef struct {
     tipo_fila* vec;
@@ -50,7 +51,7 @@ static void fila_overflow(Fila *fila) {
 
 static void fila_insere(Fila *fila, tipo_fila elemento) {
     if( fila->n_elementos == fila->tamanho) {
-        overflow_fila(fila);
+        fila_overflow(fila);
     }
 
     fila->vec[fila->fim] = elemento;
@@ -68,14 +69,5 @@ static tipo_fila fila_remove(Fila *fila) {
     fila->inicio = (fila->inicio + 1) % fila->tamanho;
     fila->n_elementos--;
     return elemento_retirado;
-}
-
-static void fila_print(Fila fila) {
-    int iter = fila.inicio;
-    for( int i = 0; i < fila.n_elementos; i++ ) {
-        printf("%d ", fila.vec[iter]);
-        iter = (iter + 1) % fila.tamanho;
-    }
-    printf("\n");
 }
 #endif

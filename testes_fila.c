@@ -1,7 +1,17 @@
+typedef int tipo_fila;
+
 #include "include/fila.h"
 
 //Teste bobo e um tanto precário para fila.
-//Quando for testar, mudar o tipo da fila no fila.h para int
+
+static void fila_print(Fila fila) {
+    int iter = fila.inicio;
+    for( int i = 0; i < fila.n_elementos; i++ ) {
+        printf("%d ", fila.vec[iter]);
+        iter = (iter + 1) % fila.tamanho;
+    }
+    printf("\n");
+}
 
 int main()
 {

@@ -4,7 +4,7 @@
 #include "include/conc_util.h"
 #include "include/timer.h"
 
-static my_float my_abs(my_float n) {
+my_float my_abs(my_float n) {
     return n < 0 ? -n : n;
 }
 

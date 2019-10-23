@@ -1,7 +1,10 @@
 #ifndef _INTEGRAL_SEQUENCIAL_H
 #define _INTEGRAL_SEQUENCIAL_H
 
+#ifndef _MY_FLOAT_DEF
+#define _MY_FLOAT_DEF
 typedef double my_float;
+#endif
 
 /*
 Calcula a integral de 'func' no intervalo [a,b].
