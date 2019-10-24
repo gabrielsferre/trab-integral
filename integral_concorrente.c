@@ -1,75 +1,107 @@
 #include "include/integral_concorrente.h"
-#include "math.h"
+#include "include/integral_sequencial.h"
 
-#define RECURSAO_MAX 10
+#include "include/timer.h"
+#include "include/funcoes.h"
+
+#define DIVISOES_NO_INTERVALO 10
 
 typedef double my_float;
 
+//argumentos passados à função chamada por pthread_create
 typedef struct {
-    my_float a;
-    my_float b;
-} intervalo_t;
-
-typedef intervalo_t tipo_fila; 
-
-#include "include/fila.h"
-
-static my_float soma_integral = 0;
-static int nos_recursao_abertos = 0;
-static int nos_recursao_fechados = 0;
-static Fila intervalos_fila;
+    my_float(*func)(my_float);
+    my_float inicio;
+    my_float erro;
+} argumento_t;
 
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-static void reseta_variaveis_globais() {
-    soma_integral = 0;
-    nos_recursao_abertos = 0;
-    nos_recursao_fechados = 0;
-    fila_delete(&intervalos_fila);
-}
+static int indice_intervalo = 0;
+static my_float tamanho_intervalo;
 
 static my_float my_abs(my_float n) {
     return n < 0 ? -n : n;
 }
 
-static int pow_2(int n) {
-    int r = 1;
-    while(n > 0) {
-        r *= 2;
-        n--;
+
+static void* thread_func(void* arg) {
+    argumento_t argumento = *(argumento_t*)arg;
+    my_float soma = 0;
+
+    Pthread_mutex_lock(&mutex);
+    while(indice_intervalo < DIVISOES_NO_INTERVALO) {
+        my_float a = argumento.inicio + tamanho_intervalo * indice_intervalo;
+        my_float b = a + tamanho_intervalo;
+        indice_intervalo++;
+
+        Pthread_mutex_unlock(&mutex);
+        soma += integral_sequencial(argumento.func, a, b, argumento.erro);
+        Pthread_mutex_lock(&mutex);
     }
-    return r;
+    Pthread_mutex_unlock(&mutex);
+
+    my_float* resultado = (my_float*)Malloc(sizeof(my_float));
+    *resultado = soma;
+    
+    pthread_exit(resultado);
 }
 
-static void integral_recursiva( my_float(*func)(my_float), my_float a, my_float b, my_float erro, int nivel_recursao) {
-    if(nivel_recursao == RECURSAO_MAX) {
-        intervalo_t intervalo = {a,b};
-        pthread_mutex_lock(&mutex);
-        fila_insere(&intervalos_fila, intervalo);
-        nos_recursao_abertos += pow_2(RECURSAO_MAX - 1) - 1;
-        pthread_mutex_unlock(&mutex);
-        return;
+my_float integral_concorrente( my_float(*func)(my_float), my_float a, my_float b, my_float erro, int n_threads ) {
+
+    pthread_t* threads = (pthread_t*)Malloc(sizeof(pthread_t) * n_threads);
+    argumento_t argumento = {func, a, erro};
+
+    indice_intervalo = 0;
+    tamanho_intervalo = (b - a) / DIVISOES_NO_INTERVALO;
+    
+    for(int i = 0; i < n_threads; i++) {
+        Pthread_create(threads + i, NULL, thread_func, &argumento);
     }
 
-    my_float c = (a+b)/2;    //ponto medio entre a e b
-    my_float a_c = (a+c)/2;  //ponto medio entre a e c
-    my_float c_b = (c+b)/2;  //ponto medio entre c e b
-    my_float f_c = func(c);  //altura do retangulo com base ab 
-    my_float f_a_c = func(a_c);  //altura do retangulo com base ac
-    my_float f_c_b = func(c_b);  //altura do retangulo com base 
-    my_float integral_c = f_c * (b - a);
-    my_float integral_a_c = f_a_c * (a_c - a);
-    my_float integral_c_b = f_c_b * (b - c_b);
+    my_float soma = 0;
+    for(int i = 0; i < n_threads; i++) {
+
+        my_float* resultado;
+        Pthread_join(threads[i], (void**)&resultado);
+        soma += *resultado;
+        free(resultado);
+    }
+    free(threads);
+    return soma;
+}
+
+
+void teste(my_float(*func)(my_float), my_float a, my_float b, my_float resultado_esperado, my_float erro, const char nome_teste[]) {
+    double tempo_0;
+    double tempo;
+
+    GET_TIME(tempo_0);
+    my_float resultado = integral_concorrente(func, a, b, erro, 3);
+    GET_TIME(tempo);
+
+    tempo = tempo - tempo_0;
 
     erro = my_abs(erro);
-    if( my_abs( integral_c - (integral_a_c + integral_c_b) ) <= erro/10 ) {
-        pthread_mutex_lock(&mutex);
-        soma_integral += integral_c;
-        nos_recursao_fechados++;
-        nos_recursao_abertos -= pow_2(RECURSAO_MAX - nivel_recursao);
-        pthread_mutex_unlock(&mutex);
-        return;
+    if( my_abs(resultado - resultado_esperado) > erro ) {
+        printf("Erro no teste \"%.64s\"\n", nome_teste);
+        printf("Resultado esperado: %.10f\n", resultado_esperado);
+        printf("Resultado obtido: %.10f\n\n", resultado);
     }
-    integral_recursiva(func, a, c, erro, nivel_recursao + 1);
-    integral_recursiva(func, c, b, erro, nivel_recursao + 1);
+    else {
+        printf("Passou no teste \"%.64s\"\n", nome_teste);
+    }
+    printf("Tempo: %.10f\n\n", tempo);
+}
+
+int main() {
+    teste(cos, 0, PI/2, 1, 1e-6, "cosseno");
+    teste(exp, 1, 0, 1 - E_NUM, 1e-5, "exponencial");
+    teste(func_a, 2, 7, 27.5, 1e-5, "função a");
+    teste(func_b, -1, 1, PI/2, 1e-5, "função b");
+    teste(func_c, -20, 100, 336002, 1, "função c");
+    teste(func_d, -8, -0.55, 0.546625, 1e-6, "função d");
+    teste(func_e, -8, -0.55, -0.46402, 1e-5, "função e");
+    teste(func_f, -10, 20, 200.245, 1e-3, "função f");
+    teste(func_g, -2, 1, 0.562653, 1e-6, "função g");
 }

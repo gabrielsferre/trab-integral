@@ -31,7 +31,7 @@ void teste(my_float(*func)(my_float), my_float a, my_float b, my_float resultado
 }
 
 int main() {
-    teste(cos, 0, PI/2, 1, 1e-5, "cosseno");
+    teste(cos, 0, PI/2, 1, 1e-6, "cosseno");
     teste(exp, 1, 0, 1 - E_NUM, 1e-5, "exponencial");
     teste(func_a, 2, 7, 27.5, 1e-5, "função a");
     teste(func_b, -1, 1, PI/2, 1e-5, "função b");
