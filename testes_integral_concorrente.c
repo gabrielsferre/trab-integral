@@ -1,8 +1,12 @@
+//#include "include/integral_concorrente.h" está dando erro de compilação
+#include <pthread.h>
 #include <stdio.h>
-#include "include/funcoes.h"
-#include "include/integral_sequencial.h"
-#include "include/conc_util.h"
 #include "include/timer.h"
+#include "include/funcoes.h"
+
+#define N_THREADS 4
+
+extern double integral_concorrente( double(*func)(double), double a, double b, double erro, int n_threads );
 
 double my_abs(double n) {
     return n < 0 ? -n : n;
@@ -13,7 +17,7 @@ void teste(double(*func)(double), double a, double b, double resultado_esperado,
     double tempo;
 
     GET_TIME(tempo_0);
-    double resultado = integral_sequencial(func, a, b, erro);
+    double resultado = integral_concorrente(func, a, b, erro, N_THREADS);
     GET_TIME(tempo);
 
     tempo = tempo - tempo_0;

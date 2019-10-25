@@ -2,11 +2,9 @@
 
 #define RECURSAO_MAX 20
 
-typedef double my_float;
-
 typedef struct {
-    my_float a;
-    my_float b;
+    double a;
+    double b;
 } intervalo_t;
 
 typedef intervalo_t tipo_fila; 
@@ -15,11 +13,11 @@ typedef intervalo_t tipo_fila;
 
 //argumentos passados à função chamada por pthread_create
 typedef struct {
-    my_float(*func)(my_float);
-    my_float erro;
+    double(*func)(double);
+    double erro;
 } argumento_t;
 
-static my_float soma_integral = 0;
+static double soma_integral = 0;
 static int nos_recursao_abertos = 0;
 static int nos_recursao_fechados = 0;
 static Fila intervalos_fila;
@@ -36,7 +34,7 @@ static void reseta_variaveis_globais() {
     fila_delete(&intervalos_fila);
 }
 
-static my_float my_abs(my_float n) {
+static double my_abs(double n) {
     return n < 0 ? -n : n;
 }
 
@@ -49,7 +47,7 @@ static int pow_2(int n) {
     return r;
 }
 
-static void integral_recursiva( my_float(*func)(my_float), my_float a, my_float b, my_float erro, int nivel_recursao) {
+static void integral_recursiva( double(*func)(double), double a, double b, double erro, int nivel_recursao) {
     if(nivel_recursao >= RECURSAO_MAX) {
         intervalo_t intervalo = {a,b};
         Pthread_mutex_lock(&mutex);
@@ -67,15 +65,15 @@ static void integral_recursiva( my_float(*func)(my_float), my_float a, my_float 
         return;
     }
 
-    my_float c = (a+b)/2;    //ponto medio entre a e b
-    my_float a_c = (a+c)/2;  //ponto medio entre a e c
-    my_float c_b = (c+b)/2;  //ponto medio entre c e b
-    my_float f_c = func(c);  //altura do retangulo com base ab 
-    my_float f_a_c = func(a_c);  //altura do retangulo com base ac
-    my_float f_c_b = func(c_b);  //altura do retangulo com base 
-    my_float integral_c = f_c * (b - a);
-    my_float integral_a_c = f_a_c * (a_c - a);
-    my_float integral_c_b = f_c_b * (b - c_b);
+    double c = (a+b)/2;    //ponto medio entre a e b
+    double a_c = (a+c)/2;  //ponto medio entre a e c
+    double c_b = (c+b)/2;  //ponto medio entre c e b
+    double f_c = func(c);  //altura do retangulo com base ab 
+    double f_a_c = func(a_c);  //altura do retangulo com base ac
+    double f_c_b = func(c_b);  //altura do retangulo com base 
+    double integral_c = f_c * (b - a);
+    double integral_a_c = f_a_c * (a_c - a);
+    double integral_c_b = f_c_b * (b - c_b);
 
     erro = my_abs(erro);
     if( my_abs( integral_c - (integral_a_c + integral_c_b) ) <= erro/10 ) {
@@ -130,7 +128,7 @@ static void* thread_func(void* arg) {
     pthread_exit(NULL);
 }
 
-my_float integral_concorrente( my_float(*func)(my_float), my_float a, my_float b, my_float erro ) {
+double integral_concorrente( double(*func)(double), double a, double b, double erro ) {
 
     fila_init(&intervalos_fila);
     pthread_t* threads = (pthread_t*)Malloc(sizeof(pthread_t) * n_threads);
@@ -145,7 +143,7 @@ my_float integral_concorrente( my_float(*func)(my_float), my_float a, my_float b
     for(int i = 0; i < n_threads; i++) {
         Pthread_join(threads[i], NULL);
     }
-    my_float resultado = soma_integral;
+    double resultado = soma_integral;
     reseta_variaveis_globais();
     return resultado;
 }
@@ -155,12 +153,12 @@ my_float integral_concorrente( my_float(*func)(my_float), my_float a, my_float b
 
 #include "include/timer.h"
 #include "include/funcoes.h"
-void teste(my_float(*func)(my_float), my_float a, my_float b, my_float resultado_esperado, my_float erro, const char nome_teste[]) {
+void teste(double(*func)(double), double a, double b, double resultado_esperado, double erro, const char nome_teste[]) {
     double tempo_0;
     double tempo;
 
     GET_TIME(tempo_0);
-    my_float resultado = integral_concorrente(func, a, b, erro);
+    double resultado = integral_concorrente(func, a, b, erro);
     GET_TIME(tempo);
 
     tempo = tempo - tempo_0;
