@@ -1,13 +1,13 @@
 #ifndef _FILA_H
 #define _FILA_H 
 
-#include "conc_util.h"
+#include "../include/conc_util.h"
 
 /*
 Implementação de uma fila, usada para o cálculo concorrente da integral.
 */
 
-#define TAM_INICIAL 8
+#define TAM_INICIAL 8   //espaço inicial do array usado pela fila quando ela é criada
 
 // O tipo "tipo_fila" deve ser definido pelo arquivo que estiver incluindo fila.h,
 // antes de incluir fila.h 

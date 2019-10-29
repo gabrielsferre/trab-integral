@@ -4,6 +4,11 @@
 #include "include/conc_util.h"
 #include "include/timer.h"
 
+/*
+Testes de corretude e tempo de execução para o cálculo sequencial
+de integrais.
+*/
+
 double my_abs(double n) {
     return n < 0 ? -n : n;
 }
@@ -27,6 +32,8 @@ void teste(double(*func)(double), double a, double b, double resultado_esperado,
     else {
         printf("Passou no teste \"%.64s\"\n", nome_teste);
     }
+    printf("Intervalo: [%.6f, %.6f]\n", a, b);
+    printf("Erro: %.10f\n", erro);
     printf("Tempo: %.10f\n\n", tempo);
 }
 

@@ -4,6 +4,11 @@
 #include "include/timer.h"
 #include "include/funcoes.h"
 
+/*
+Testes de corretude e tempo de execução para o cálculo concorrente
+de integrais.
+*/
+
 #define N_THREADS 4
 
 extern double integral_concorrente( double(*func)(double), double a, double b, double erro, int n_threads );
@@ -31,6 +36,9 @@ void teste(double(*func)(double), double a, double b, double resultado_esperado,
     else {
         printf("Passou no teste \"%.64s\"\n", nome_teste);
     }
+    printf("Intervalo: [%.6f, %.6f]\n", a, b);
+    printf("Erro: %.10f\n", erro);
+    printf("Numero de threads: %d\n", N_THREADS);
     printf("Tempo: %.10f\n\n", tempo);
 }
 

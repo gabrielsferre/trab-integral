@@ -1,7 +1,9 @@
-#include "include/integral_concorrente.h"
+#include "../include/integral_concorrente.h"
 
 #define RECURSAO_MAX 20
 
+//intervalo de integração
+//representa uma tarefa para a thread
 typedef struct {
     double a;
     double b;
@@ -9,7 +11,7 @@ typedef struct {
 
 typedef intervalo_t tipo_fila; 
 
-#include "include/fila.h"
+#include "fila.h"
 
 //argumentos passados à função chamada por pthread_create
 typedef struct {
@@ -47,6 +49,8 @@ static int pow_2(int n) {
     return r;
 }
 
+
+//funcao que a thread realiza para cada tarefa
 static void integral_recursiva( double(*func)(double), double a, double b, double erro, int nivel_recursao) {
     if(nivel_recursao >= RECURSAO_MAX) {
         intervalo_t intervalo = {a,b};
@@ -89,6 +93,7 @@ static void integral_recursiva( double(*func)(double), double a, double b, doubl
     integral_recursiva(func, c, b, erro, nivel_recursao + 1);
 }
 
+//funcao chamada por thread_create
 static void* thread_func(void* arg) {
     argumento_t argumento = *(argumento_t*)arg;
     while(1) {
@@ -128,6 +133,18 @@ static void* thread_func(void* arg) {
     pthread_exit(NULL);
 }
 
+/*
+Calcula a integral de 'func' no intervalo [a,b].
+
+args:
+    func: função que será integrada.
+    a: primeiro valor do intervalo sobre o qual será calculada a integral
+    b: segundo valor do intervalo sobre o qual será calculada a integral
+    erro: erro absoluto admitido no valor numérico da integral
+    n_threads: número de threads que devem ser utilizadas
+retorno:
+    valor da integral calculado numericamente
+*/
 double integral_concorrente( double(*func)(double), double a, double b, double erro ) {
 
     fila_init(&intervalos_fila);
@@ -151,8 +168,8 @@ double integral_concorrente( double(*func)(double), double a, double b, double e
 
 
 
-#include "include/timer.h"
-#include "include/funcoes.h"
+#include "../include/timer.h"
+#include "../include/funcoes.h"
 void teste(double(*func)(double), double a, double b, double resultado_esperado, double erro, const char nome_teste[]) {
     double tempo_0;
     double tempo;

@@ -1,8 +1,8 @@
 #ifndef _INTEGRAL_CONCORRENTE_H
 #define _INTEGRAL_CONCORRENTE_H
 
-#include "conc_util.h"
-#include "integral_sequencial.h"
+#include "../include/conc_util.h"
+#include "../include/integral_sequencial.h"
 
 /*
 Calcula a integral de 'func' no intervalo [a,b].

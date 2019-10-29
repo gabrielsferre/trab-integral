@@ -4,6 +4,10 @@
 #include "include/funcoes.h"
 #include "include/integral_sequencial.h"
 
+/*
+Testes que comparam o tempo entre o cálculo sequencial e o concorrente 
+*/
+
 #define N_THREADS 4
 
 extern double integral_concorrente( double(*func)(double), double a, double b, double erro, int n_threads );
